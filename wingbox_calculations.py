@@ -34,6 +34,18 @@ class WingboxDesign:
         thickness : float
             Skin thickness in meters (default: 2mm)
         """
+        # Input validation
+        if span <= 0:
+            raise ValueError("Span must be positive")
+        if chord_root <= 0:
+            raise ValueError("Root chord must be positive")
+        if chord_tip < 0:
+            raise ValueError("Tip chord must be non-negative")
+        if thickness <= 0:
+            raise ValueError("Thickness must be positive")
+        if chord_tip > chord_root:
+            raise ValueError("Tip chord should not exceed root chord for typical designs")
+            
         self.span = span
         self.chord_root = chord_root
         self.chord_tip = chord_tip
@@ -123,15 +135,10 @@ class WingboxDesign:
         moment_arm = (4 * self.span) / (3 * math.pi)
         return lift_force * moment_arm
     
-    def calculate_wingbox_height(self, chord_position=0.15):
+    def calculate_wingbox_height(self):
         """
         Estimate wingbox height based on airfoil thickness.
         Typical wingbox extends from 15% to 65% chord.
-        
-        Parameters:
-        -----------
-        chord_position : float
-            Relative position along chord for height estimation
             
         Returns:
         --------
@@ -157,6 +164,9 @@ class WingboxDesign:
             - 'max_stress': Maximum bending stress (Pa)
             - 'margin_of_safety': Margin of safety (dimensionless)
         """
+        if bending_moment < 0:
+            raise ValueError("Bending moment must be non-negative")
+            
         # Simplified wingbox cross-section
         h = self.calculate_wingbox_height()
         b = 0.5 * self.chord_root  # Width approximation
@@ -167,8 +177,11 @@ class WingboxDesign:
         # Maximum stress at outer fiber
         max_stress = bending_moment * (h/2) / I
         
-        # Margin of safety
-        margin_of_safety = (self.sigma_yield / max_stress) - 1
+        # Margin of safety (handle zero stress case)
+        if max_stress > 0:
+            margin_of_safety = (self.sigma_yield / max_stress) - 1
+        else:
+            margin_of_safety = float('inf')  # Infinite margin if no stress
         
         return {
             'max_stress': max_stress,
