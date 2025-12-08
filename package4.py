@@ -168,7 +168,7 @@ print(f"For the entire wingbox:\nI_xx = {I_xx}\nI_zz = {I_zz}\nI_xz={I_xz}")
 
 
 # XFLR data from postive y onwards at aoa 0
-df = pd.read_csv('.\Alpha0.txt', on_bad_lines='skip')
+df = pd.read_csv('./Alpha0.txt', on_bad_lines='skip')
 Alpha0_arr = df.to_numpy()
 
 y_span0 = Alpha0_arr[19:,0]
@@ -179,7 +179,7 @@ Cdi0 = Alpha0_arr[19:,5]
 Cm0 = Alpha0_arr[19:,7]
 
 # XFLR data from postive y onwards at aoa 10
-df1 = pd.read_csv('.\Alpha10.txt', on_bad_lines='skip')
+df1 = pd.read_csv('./Alpha10.txt', on_bad_lines='skip')
 Alpha10_arr = df1.to_numpy()
 
 y_span10 = Alpha10_arr[19:,0]
