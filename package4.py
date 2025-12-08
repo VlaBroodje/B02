@@ -442,12 +442,13 @@ plt.ylabel("Moment (Nm)")
 plt.show()
 
 def deflection(y):
-    # IntegraV_arr_func(y) = V(y) / (E * Ixx) four times
-    dddvdx = V_func(y) / Emod / distributed_Ixx(y)
-    ddvdx = sp.integrate.cumulative_trapezoid(dddvdx, y_linspace, initial=0)
-    dvdx = sp.integrate.cumulative_trapezoid(ddvdx, y_linspace, initial=0)
-    vdx = sp.integrate.cumulative_trapezoid(dvdx, y_linspace, initial=0)
-    v = sp.integrate.cumulative_trapezoid(vdx, y_linspace, initial=0)
+    # Correct integration: EI * d²v/dy² = M(y)
+    # Integrate twice from root (y=0) with boundary conditions: v(0)=0, dv/dy(0)=0
+    # First integration: dv/dy = ∫[0 to y] M(s)/(EI(s)) ds, with dv/dy(0) = 0
+    curvature = M_arr / (Emod * distributed_Ixx(y_linspace))
+    slope = sp.integrate.cumulative_trapezoid(curvature, y_linspace, initial=0)
+    # Second integration: v = ∫[0 to y] slope(s) ds, with v(0) = 0
+    v = sp.integrate.cumulative_trapezoid(slope, y_linspace, initial=0)
     return v
 
 v = deflection(y_linspace)
