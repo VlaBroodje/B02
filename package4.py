@@ -4,57 +4,11 @@ from scipy import interpolate
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Material properties
-Emod = 72.4e9       #Pa
-Gmod = 28e9         #Pa (shear modulus)
-rho = 2780          #kg/m^3
-sigma_y = 450e6     #Pa (yield strength)
-poission = .33      #-
+# custom functions and constants
+from constants import *
+from functions import *
 
-# Environment
-M = .68
-MTOM = 10689
-OEM = 6233.61
-# T = 200
-rhoCruise = 0.28736
-V = 200.6
-rhoISA = 1.225
-qCruise = rhoCruise*(V**2)/2
-
-# Wing properties
-quarterSweep = 11       #deg
-taper = 0.36            #-
-b = 21.4                #m
-Cr = 3.49               #m
-Ct = 1.26               #m
-dihedral = 4            #deg
-MAC = 2.55              #m
-Xlemac = 6.14           #m
-Xtemac = 8.69           #m
-MACspanwise = 4.51      #m
-Sw = 50.88              #m^2
-Swf = 24.05             #m^2
-GearDist = 2.58         #m
-GearLength = 1.3        #m
-Mwing = 964.5           #kg
-Mgear = 189.28/2        #kg
-Fuel = 2                #m^3 To be determined
-t = .005                #m/c (spar thickness)
-x_front = 0.3           #-
-x_rear = 0.7            #-
-zmax_front = 0.0787        #found from NACA 2412 geometry at 0.3c
-zmin_front = -0.04123125878      #-//-
-zmax_rear = 0.05161872904        #found from NACA 2412 geometry at 0.7c
-zmin_rear = -0.02161872904         #-//-
-CL0 = 0.180034          #-
-CL10 = 1.042209         #-
-CM0 = -0.166919         #-
-CM10 = -0.783209        #-
-alpha_to = 21.05        #deg
-alpha_land = 18.66      #deg
-alpha_cruise = 0.91     #deg 
-Mfuel = 3167            #kg
-print ("WEIGHT SSDADSDDS",MTOM -Mfuel)
+# print ("WEIGHT SSDADSDDS",MTOM -Mfuel)
 
 #Number of stringers on top and bottom
 top_stringers = 10    
@@ -76,27 +30,6 @@ x_arr = np.zeros(N_stringers + 4,dtype=np.float64) # +4 accounts for the big spa
 z_arr = np.zeros_like(x_arr) #zero_like generates an array of zeros with the same shape as x_arr
 A_arr = np.zeros_like(x_arr)
 
-def determine_CLalpha(CL10,CL0,dalpha):
-    return (CL10 - CL0) / dalpha
-
-def determine_CL(V,n,W=MTOM*9.81,rho=rhoISA,s=Sw):
-    return n*W/(.5 * rho * V * V * s)
-
-def determine_centroid(x_arr,z_arr,A_arr):
-    # Calculate the centroid of the wingbox based on the geometric parameters and return as an array (x,z)
-    X = sum(x_arr * A_arr)
-    Z = sum(z_arr * A_arr)
-    return (np.array((X,Z))/sum(A_arr))
-
-def parallel_axis(area,coord1,coord2):
-    # Calculate parallel-axis contribution based on areas and coords of spars and strigers
-    return sum(area * coord1 * coord2)
-
-def spar_length(coord1,coord2):
-    return np.sqrt((coord2[0]-coord1[0])**2 + (coord2[1]-coord1[1])**2)
-
-def midpoint(coord1,coord2):
-    return [(coord1[0]+coord2[0])/2 , (coord1[1]+coord2[1])/2]
 
 # Define coordinates of the 4 big spars
 spars = np.empty(4, dtype=object) #Array containing the 4 coordinates of the saprs
@@ -105,38 +38,15 @@ spars[1] = np.array([x_front,zmax_front])   #Top left
 spars[2] = np.array([x_rear,zmax_rear])    #Top right
 spars[3] = np.array([x_rear,zmin_rear])   #Bottom right
 
- 
-# Calculate parameters for 4 big spars
-for i in range(3):
-    centroid = midpoint(spars[i],spars[i+1])
-    L = spar_length(spars[i],spars[i+1])
-    sin = (spars[i+1][1]-spars[i][1])/L
-    cos = (spars[i+1][0]-spars[i][0])/L
-    I_xx += t * L**3 / 12 * sin**2
-    I_zz += t * L**3 / 12 * cos**2
-    I_xz += t * L**3 / 12 * sin * cos
-    A = t * L
-    print(f"Point {i+1} to {i+2}: Centroid = {centroid}, Area = {A}, I_xx = {t * L**3 / 12 * sin**2}, I_zz = {t * L**3 / 12 * cos**2}, I_xz = {t * L**3 / 12 * sin * cos}")
-    # Assign to arrays
-    x_arr[N_stringers + i] = centroid[0]
-    z_arr[N_stringers + i] = centroid[1]
-    A_arr[N_stringers + i] = A
+spars_MoI_results = spars_MoI(spars, t)
+I_xx += spars_MoI_results[0]
+I_zz += spars_MoI_results[1]
+I_xz += spars_MoI_results[2]
 
-# Last spar from point 3 to point 0
-centroid = midpoint(spars[3],spars[0])
-L = spar_length(spars[3],spars[0])
-sin = (spars[3][1]-spars[0][1])/L
-cos = (spars[3][0]-spars[0][0])/L
-I_xx += t * L**3 / 12 * sin**2
-I_zz += t * L**3 / 12 * cos**2
-I_xz += t * L**3 / 12 * sin * cos
-A = t * L
-print(f"Point {3} to {0}: Centroid = {centroid}, Area = {A}, I_xx = {t * L**3 / 12 * sin**2}, I_zz = {t * L**3 / 12 * cos**2}, I_xz = {t * L**3 / 12 * sin * cos}, sin = {sin}, cos = {cos}")
-
-# Assign to arrays
-x_arr[N_stringers + 3] = centroid[0]
-z_arr[N_stringers + 3] = centroid[1]
-A_arr[N_stringers + 3] = A
+# Assign to last indeces in arrays
+x_arr[N_stringers:] = spars_MoI_results[3]
+z_arr[N_stringers:] = spars_MoI_results[4]
+A_arr[N_stringers:] = spars_MoI_results[5]
 
 # Assign areas to area array corresponding to stringers on top and bottom spar
 A_arr[0:top_stringers] = A_top                  # Top stringers                
@@ -213,7 +123,6 @@ funcdCmdCM = sp.interpolate.CubicSpline(y_span0,Cm_slope)
     
 
 y_linspace = np.linspace(0,b/2,500)
-
 
 
 #CM0+CM_a*(CL-CL0/CL_a)
@@ -368,6 +277,7 @@ print(TotalBendingMoment)
 # print(BM_arr)
 
 # Plot to verify interpolation functions
+
 """ 
 y_arr = np.linspace(0,b/2)
 interp_Cm10 = np.zeros_like(y_arr)
