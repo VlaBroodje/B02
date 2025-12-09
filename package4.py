@@ -232,7 +232,7 @@ def BendingMoment(x):
 
 TotalBendingMoment = sp.integrate.quad(BendingMoment,0,b/2)
 
-
+# Interpolation verification plots
 """ 
 y_arr = np.linspace(0,b/2)
 interp_Cm10 = np.zeros_like(y_arr)
@@ -291,7 +291,6 @@ def deflection(y_linspace):
     # Correct integration: EI * d²v/dy² = M(y)
     # Integrate twice from root (y=0) with boundary conditions: v(0)=0, dv/dy(0)=0
     # First integration: dv/dy = ∫[0 to y] M(s)/(EI(s)) ds, with dv/dy(0) = 0
-    # Use interpolated M_func for better precision
     ddvdy = M_func(y_linspace) / (Emod * distributed_Ixx(y_linspace))
     dvdy = sp.integrate.cumulative_trapezoid(ddvdy, y_linspace, initial=0)
     # Second integration: v = ∫[0 to y] slope(s) ds, with v(0) = 0
@@ -310,9 +309,6 @@ A_enclosed = abs(A_enclosed) / 2
 # print("Enclosed area:", A_enclosed)
 # print(f"Enclosed area at cr = {Cr} m is {A_enclosed * Cr**2} m^2")
 
-
-
-
 """ 
 # Print polynomial coefficients for shear, moment and deflection
 print("DEFLECTION: ",np.polyfit(y_linspace, v, 5))
@@ -322,5 +318,8 @@ print("MOMENT: ",np.polyfit(y_linspace, M_arr, 8))
 
 plt.plot(y_linspace, V_arr, label='Shear Force')
 plt.plot(y_linspace, M_arr, label='Bending Moment')
+plt.ylabel('Force (N) / Moment (Nm)')
+plt.xlabel('Spanwise Location (m)')
+plt.title('Shear Force and Bending Moment Distribution along Span')
 plt.legend()
 plt.show()
