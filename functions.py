@@ -52,6 +52,6 @@ def spars_MoI(spars, t):
         x_arr[i0] = centroid[0]
         z_arr[i0] = centroid[1]
         A_arr[i0] = A
-        print(f"x_arr: {x_arr}, z_arr: {z_arr}, A_arr: {A_arr}")
+        # print(f"x_arr: {x_arr}, z_arr: {z_arr}, A_arr: {A_arr}")
     return I_xx, I_zz, I_xz, x_arr, z_arr, A_arr
     

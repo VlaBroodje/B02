@@ -106,7 +106,7 @@ z_arr[top_stringers:N_stringers] = np.linspace(zmin_front,zmin_rear,bottom_strin
 
 # Calulate centroid 
 Cx,Cz = determine_centroid(x_arr,z_arr,A_arr)
-print(f"The centroid is {Cx},{Cz}")
+print(f"The centroid is {round(Cx,4)},{round(Cz,4)}")
 
 SCx,SCz = Cx,Cz # Assume centroid is also Shear Centre for now
 
@@ -142,7 +142,6 @@ A_enclosed = abs(A_enclosed) / 2
 # print("Enclosed area:", A_enclosed)
 # print(f"Enclosed area at cr = {Cr} m is {A_enclosed * Cr**2} m^2")
 
-
 """ 
 Define interpolated functions for spanwise distributions of aerodynamic coefficients and structural properties
 """
@@ -158,7 +157,7 @@ funcdCldCL = sp.interpolate.CubicSpline(y_span0,Cl_alpha)
 funcdCmdCM = sp.interpolate.CubicSpline(y_span0,Cm_alpha)
 
 # Spanwise locations
-y_linspace = np.linspace(0,b/2,500)
+y_linspace = np.linspace(0,b/2,250)
 
 # Distributed aerodynamic coefficient functions
 def distributed_Cm(y,CM=CM0):
@@ -241,13 +240,14 @@ Load_CL = determine_CL(vCrit,nFactor, W = (MTOM-Mfuel)*9.81)
 # print("ALPHA",(Load_CL-0.180034)/((1.042209-0.180034)/10))
 
 V_func = shear_distribution(y_linspace,CL=Load_CL,q=.5*vCrit**2*rhoISA)
-M_func = sp.interpolate.CubicSpline(y_linspace, M_arr)
+
 
 for i,y in enumerate(y_linspace):
     M0 = sp.integrate.quad(V_func,0,b/2)
     M = sp.integrate.quad(V_func,y,b/2)
     M_arr[i]=-M[0]
 
+M_func = sp.interpolate.CubicSpline(y_linspace, M_arr)
 
 def deflection(y_linspace):
     ddvdy = M_func(y_linspace) / (Emod * distributed_Ixx(y_linspace))
@@ -259,15 +259,15 @@ def deflection(y_linspace):
 plot_deflection()
 
 # Plot shear force and bending moment distributions
-""" 
-plt.plot(y_linspace, V_arr, label='Shear Force')
-plt.plot(y_linspace, M_arr, label='Bending Moment')
+
+plt.plot(y_linspace, V_func(y_linspace), label='Shear Force')
+plt.plot(y_linspace, M_func(y_linspace), label='Bending Moment')
 plt.ylabel('Force (N) / Moment (Nm)')
 plt.xlabel('Spanwise Location (m)')
 plt.title('Shear Force and Bending Moment Distribution along Span')
 plt.legend()
 plt.show()
- """
+
 
 # Plot wingbox cross-section with stringers and centroid
 """ 
@@ -332,4 +332,4 @@ plt.title("Cl distribution verification")
 plt.legend()
 
 plt.show() 
-"""
+ """
