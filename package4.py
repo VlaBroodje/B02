@@ -243,7 +243,6 @@ V_func = shear_distribution(y_linspace,CL=Load_CL,q=.5*vCrit**2*rhoISA)
 
 
 for i,y in enumerate(y_linspace):
-    M0 = sp.integrate.quad(V_func,0,b/2)
     M = sp.integrate.quad(V_func,y,b/2)
     M_arr[i]=-M[0]
 
