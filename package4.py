@@ -33,6 +33,9 @@ Cm10 = Alpha10_arr[19:,7]
 
 jan = 000000
 hugo = 11111
+alicja = 22222
+hello = 90
+
 
 #Cl equation determination
 Cl_intercept = CL0
