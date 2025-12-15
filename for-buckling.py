@@ -46,3 +46,5 @@ sigma_crit_rear = ((3.14**2)*k_c*Emod)/(12*(1-poisson**2))*((t/b_plate_rear)**2)
 
 #column buckling
 sigma_crit = (K*(3.12**2)*Emod*I)/((y_linspace**2)*A_spar)
+
+#diagramms
