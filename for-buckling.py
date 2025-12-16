@@ -16,6 +16,10 @@ k_v = 2
 k_c = 4
 K = 3
 
+#input:
+nribs = 
+ribspacing = nribs/
+
 #forces
 V_arr_func, V_arr = force_distribution(y_linspace)
 
@@ -43,6 +47,8 @@ q = T/(2*A_enclosed)
 #skin buckling
 sigma_crit_front = ((3.14**2)*k_c*Emod)/(12*(1-poisson**2))*((t/b_plate_front)**2)
 sigma_crit_rear = ((3.14**2)*k_c*Emod)/(12*(1-poisson**2))*((t/b_plate_rear)**2)
+
+sigma_max = 
 
 #column buckling
 sigma_crit = (K*(3.12**2)*Emod*I)/((y_linspace**2)*A_spar)
