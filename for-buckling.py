@@ -134,9 +134,9 @@ MoF_stringer_compressive = sigma_crit_buckling / sigma_max_compressive
 MoF_stringer_tensile = sigma_crit_buckling / sigma_max_tensile
 
 #diagramms
-plt.plot(y_linspace, MoF_web_front, label='Margin of safety (web, front)')
-plt.plot(y_linspace, MoF_web_rear, label='Margin of safety (web, rear)')
-plt.ylim(-5000,5000)
+plt.plot(y_linspace, margin_of_safety_web_front, label='Margin of safety (web, front)')
+plt.plot(y_linspace, margin_of_safety_web_rear, label='Margin of safety (web, rear)')
+plt.ylim(-5,5)
 plt.ylabel('Safety Margin')
 plt.xlabel('Spanwise Location (m)')
 plt.title('Safety Margin in Spar Web Distribution along Span')
