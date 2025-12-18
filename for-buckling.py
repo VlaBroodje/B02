@@ -72,7 +72,7 @@ q = Torque_arr/(2*A_enclosed)
 
 tau_max_ave_front = tau_max_average + q/thickness
 tau_max_ave_rear = tau_max_average - q/thickness
-print(f'Maximum applied stress for spars {round(max(tau_max_ave_front,2)), tau_max_ave_rear}')
+#print(f'Maximum applied stress for spars {round(max(tau_max_ave_front,2)), tau_max_ave_rear}')
 
 #skin buckling
 sigma_crit_top = ((pi**2)*k_c*Emod)/(12*(1-poisson**2))*((t/b_plate_front)**2)
@@ -110,7 +110,7 @@ margin_of_safety_stringer_tensile = sigma_crit_buckling / sigma_max_tensile
 #diagramms
 plt.plot(y_linspace, margin_of_safety_web_front, label='Margin of safety (web, front)')
 plt.plot(y_linspace, margin_of_safety_web_rear, label='Margin of safety (web, rear)')
-plt.ylim(-5000,5000)
+plt.ylim(-5,5)
 plt.ylabel('Safety Margin')
 plt.xlabel('Spanwise Location (m)')
 plt.title('Safety Margin in Spar Web Distribution along Span')
