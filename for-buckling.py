@@ -5,6 +5,10 @@ from package4 import A_enclosed, y_linspace, t, b, zmax_front, zmax_rear, zmin_f
 from bendingtorsion import funcT
 from constants import *
 
+# shloks stuff
+t_spar_root = .013
+t_flage_root = .00039
+
 #variables
 k_s = 10
 k_v = 2
@@ -15,7 +19,10 @@ pi = np.pi
 """ Heights of front and rear spar """
 h_f_spar = zmax_front - zmin_front
 h_r_spar = zmax_rear - zmin_rear
-t_spar = t
+
+# Divide by funcChord(0) to get relative thickness distribution, because t_spar_root are at root 
+t_spar_arr = t_spar_root * funcChord(y_linspace)/funcChord(0)
+t_flange_arr = t_flage_root * funcChord(y_linspace)/funcChord(0)
 
 """ Stringer parameters """
 a = .04    # height and width of L stringer section
@@ -77,10 +84,6 @@ c_arr = funcChord(y_linspace)
 C_stringer = L_centroid(a,t)
 A_stringer = L_area(a,t_s)
 I_min_stringer = L_Imin(a,t_s)
-
-# Spar thickness distribution
-# Assuming constant thickness for simplicity, should be different for front and rear spar, but then vary linearly with span 
-t_spar_arr = t * funcChord(y_linspace)
 
 
 #web buckling front spar
